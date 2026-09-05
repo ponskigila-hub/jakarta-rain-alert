@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { jakartaDistricts } from '@/data/mockData';
 
 // Custom styles for tooltips
@@ -110,21 +110,28 @@ export const JakartaMap = () => {
 
   return (
     <Card className="overflow-hidden">
-      <div ref={mapContainer} className="w-full h-[300px] sm:h-[400px] lg:h-[500px]" />
-      <div className="p-3 sm:p-4 bg-muted/50 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-risk-safe" />
-          <span className="whitespace-nowrap">Low (&lt;20mm)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-risk-medium" />
-          <span className="whitespace-nowrap">Medium (20-50mm)</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-risk-high" />
-          <span className="whitespace-nowrap">High (&gt;50mm)</span>
+      <div className="relative">
+        <div ref={mapContainer} className="w-full h-[300px] sm:h-[400px] lg:h-[500px]" />
+        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-[400] bg-card/90 backdrop-blur-sm border rounded-lg px-2.5 py-1 text-[11px] sm:text-xs text-muted-foreground shadow-sm">
+          Numbers show rainfall in mm
         </div>
       </div>
+      <CardContent className="p-3 sm:p-4 bg-muted/40 border-t">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-6 text-xs sm:text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-risk-safe ring-4 ring-risk-safe/15" />
+            <span className="whitespace-nowrap text-muted-foreground">Low <span className="text-foreground/70">(&lt;20mm)</span></span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-risk-medium ring-4 ring-risk-medium/15" />
+            <span className="whitespace-nowrap text-muted-foreground">Medium <span className="text-foreground/70">(20–50mm)</span></span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-risk-high ring-4 ring-risk-high/15" />
+            <span className="whitespace-nowrap text-muted-foreground">High <span className="text-foreground/70">(&gt;50mm)</span></span>
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
 };

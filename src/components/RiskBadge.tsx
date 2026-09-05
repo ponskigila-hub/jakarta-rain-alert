@@ -30,7 +30,7 @@ export const RiskBadge = ({ level, showIcon = true }: RiskBadgeProps) => {
   const Icon = config.icon;
 
   return (
-    <Badge className={config.className}>
+    <Badge className={`${config.className} whitespace-nowrap`}>
       {showIcon && <Icon className="w-3 h-3 mr-1" />}
       {config.label}
     </Badge>
