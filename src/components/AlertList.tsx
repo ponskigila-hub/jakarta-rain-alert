@@ -4,6 +4,8 @@ import { Alert, RiskLevel } from '@/types/flood';
 import { RiskBadge } from './RiskBadge';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertTriangle, AlertCircle, CheckCircle, BellOff } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { jakartaDistricts } from '@/data/mockData';
 
 interface AlertListProps {
   alerts: Alert[];
@@ -43,11 +45,10 @@ export const AlertList = ({ alerts }: AlertListProps) => {
               {alerts.map((alert) => {
                 const config = levelConfig[alert.level];
                 const Icon = config.icon;
-                return (
-                  <div
-                    key={alert.id}
-                    className={`p-3.5 rounded-lg border border-l-4 ${config.border} bg-card hover:bg-accent/5 hover:shadow-sm transition-all`}
-                  >
+                const matchedDistrict = jakartaDistricts.find((d) => d.name === alert.district);
+                const rowClass = `block p-3.5 rounded-lg border border-l-4 ${config.border} bg-card hover:bg-accent/5 hover:shadow-sm transition-all`;
+                const content = (
+                  <>
                     <div className="flex items-start justify-between gap-3 mb-1.5">
                       <div className="flex items-center gap-2 min-w-0">
                         <Icon className={`w-4 h-4 shrink-0 ${config.iconColor}`} />
@@ -59,6 +60,16 @@ export const AlertList = ({ alerts }: AlertListProps) => {
                     <p className="text-xs text-muted-foreground">
                       {formatDistanceToNow(new Date(alert.timestamp), { addSuffix: true })}
                     </p>
+                  </>
+                );
+
+                return matchedDistrict ? (
+                  <Link key={alert.id} to={`/district/${matchedDistrict.id}`} className={rowClass}>
+                    {content}
+                  </Link>
+                ) : (
+                  <div key={alert.id} className={rowClass}>
+                    {content}
                   </div>
                 );
               })}

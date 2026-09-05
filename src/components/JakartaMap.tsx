@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +21,9 @@ const tooltipStyles = `
   }
   .district-popup .leaflet-popup-content-wrapper {
     border-radius: 8px;
+  }
+  .leaflet-interactive {
+    cursor: pointer;
   }
 `;
 
@@ -47,6 +51,7 @@ const riskColors = {
 export const JakartaMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
@@ -65,7 +70,7 @@ export const JakartaMap = () => {
       if (!map.current) return;
 
       const color = riskColors[district.riskLevel];
-      
+
       // Create circle marker like the reference code
       const marker = L.circleMarker(district.coordinates, {
         radius: 22,
@@ -82,21 +87,33 @@ export const JakartaMap = () => {
         className: `district-label district-label-${district.riskLevel}`
       });
 
-      // Add click popup with district info
+      // Add click popup with a quick preview + link to the full detail page
       marker.on('click', function() {
         if (!map.current) return;
-        L.popup({ offset: [0, -10], className: 'district-popup' })
+        const popup = L.popup({ offset: [0, -10], className: 'district-popup', minWidth: 220 })
           .setLatLng(district.coordinates)
           .setContent(`
-            <div style="min-width:220px; font-family: sans-serif;">
-              <b style="font-size:1.2em;">${district.name}</b><br>
-              <b>Rainfall:</b> ${district.rainfall}mm<br>
-              <b>Water Level:</b> ${district.waterLevel}cm<br>
-              <b>Area Type:</b> ${district.isFloodProne ? 'Flood-Prone Area' : 'Normal Area ✓'}<br>
-              <b>Risk Level:</b> <span style="color:${color};font-weight:bold;text-transform:uppercase;">${district.riskLevel}</span>
+            <div style="min-width:220px; font-family: inherit;">
+              <b style="font-size:1.15em;">${district.name}</b><br>
+              <div style="margin: 6px 0; color:#555; font-size: 0.85em;">
+                <b>Rainfall:</b> ${district.rainfall}mm &nbsp;·&nbsp;
+                <b>Water:</b> ${district.waterLevel}cm
+              </div>
+              <span style="display:inline-block; margin-bottom:8px; padding:2px 8px; border-radius:999px; font-size:0.75em; font-weight:600; text-transform:uppercase; color:white; background:${color};">${district.riskLevel} risk</span><br>
+              <button id="view-details-${district.id}" style="width:100%; margin-top:4px; padding:6px 10px; border-radius:6px; border:none; background:${color}; color:white; font-weight:600; font-size:0.85em; cursor:pointer;">
+                View full details →
+              </button>
             </div>
           `)
           .openOn(map.current);
+
+        // Wire the button to SPA-navigate to the detail page
+        setTimeout(() => {
+          const btn = document.getElementById(`view-details-${district.id}`);
+          btn?.addEventListener('click', () => {
+            navigate(`/district/${district.id}`);
+          });
+        }, 0);
       });
     });
 
@@ -106,7 +123,7 @@ export const JakartaMap = () => {
         map.current = null;
       }
     };
-  }, []);
+  }, [navigate]);
 
   return (
     <Card className="overflow-hidden">

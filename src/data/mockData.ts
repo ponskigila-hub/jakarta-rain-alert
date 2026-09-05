@@ -15,6 +15,9 @@ export const jakartaDistricts: DistrictData[] = [
     coordinates: [-6.1862, 106.8341],
     isFloodProne: false,
     waterLevel: 35,
+    population: '1.1 million',
+    description:
+      "Jakarta's central district, home to national government buildings and Monas. Drainage infrastructure is relatively modern, but dense urban development limits water absorption during heavy storms.",
   },
   {
     id: 'jakarta-utara',
@@ -24,6 +27,9 @@ export const jakartaDistricts: DistrictData[] = [
     coordinates: [-6.1386, 106.8826],
     isFloodProne: true,
     waterLevel: 85,
+    population: '1.8 million',
+    description:
+      'A low-lying coastal district facing land subsidence and rising sea levels. Combined with heavy rainfall and tidal surges, this makes it the most flood-vulnerable area in Jakarta.',
   },
   {
     id: 'jakarta-barat',
@@ -33,6 +39,9 @@ export const jakartaDistricts: DistrictData[] = [
     coordinates: [-6.1677, 106.7637],
     isFloodProne: true,
     waterLevel: 42,
+    population: '2.4 million',
+    description:
+      'A densely populated western district crossed by several major rivers. Seasonal overflow from upstream areas often compounds local rainfall, raising flood risk during the wet season.',
   },
   {
     id: 'jakarta-selatan',
@@ -42,6 +51,9 @@ export const jakartaDistricts: DistrictData[] = [
     coordinates: [-6.2614, 106.8106],
     isFloodProne: false,
     waterLevel: 12,
+    population: '2.2 million',
+    description:
+      'The highest-elevation district in Jakarta, with more green space and better natural drainage. Generally the safest area during the rainy season, though localized flash flooding can still occur.',
   },
   {
     id: 'jakarta-timur',
@@ -51,6 +63,9 @@ export const jakartaDistricts: DistrictData[] = [
     coordinates: [-6.2250, 106.9004],
     isFloodProne: true,
     waterLevel: 78,
+    population: '2.9 million',
+    description:
+      "Jakarta's most populous district, sitting along the Ciliwung River. Upstream rainfall from Bogor and Depok frequently causes the river to overflow, affecting riverside neighborhoods.",
   },
 ];
 
@@ -157,3 +172,46 @@ export const recentAlerts: Alert[] = [
     timestamp: '2025-10-17T09:00:00',
   },
 ];
+
+// Derives a plausible per-district history by scaling the citywide trend
+// to match that district's current reading, so each detail page shows a
+// realistic-looking trend line rather than reusing the same citywide chart.
+export const getDistrictRainfallHistory = (district: DistrictData): RainfallHistory[] => {
+  const cityToday = rainfallHistory[rainfallHistory.length - 1].rainfall;
+  const scale = district.rainfall / cityToday;
+  return rainfallHistory.map((entry) => ({
+    date: entry.date,
+    rainfall: Math.max(0, Math.round(entry.rainfall * scale)),
+  }));
+};
+
+export const getDistrictWaterLevelHistory = (district: DistrictData): WaterLevelHistory[] => {
+  const cityToday = waterLevelHistory[waterLevelHistory.length - 1].waterLevel;
+  const scale = district.waterLevel / cityToday;
+  return waterLevelHistory.map((entry) => ({
+    date: entry.date,
+    waterLevel: Math.max(0, Math.round(entry.waterLevel * scale)),
+  }));
+};
+
+export const getSafetyTips = (district: DistrictData): string[] => {
+  if (district.riskLevel === 'high') {
+    return [
+      'Avoid low-lying roads and underpasses that are prone to sudden flooding.',
+      'Keep emergency supplies (water, flashlight, first aid) ready and easily accessible.',
+      'Monitor official BPBD DKI Jakarta updates and be ready to evacuate if advised.',
+      'Move vehicles and valuables to higher ground as a precaution.',
+    ];
+  }
+  if (district.riskLevel === 'medium') {
+    return [
+      'Check local drainage and clear any blockages near your property.',
+      'Stay alert to weather updates, especially during sustained heavy rain.',
+      'Have an evacuation plan ready in case conditions worsen.',
+    ];
+  }
+  return [
+    'Conditions are currently stable — no special precautions needed.',
+    'Continue to monitor forecasts during the rainy season (Oct–Mar).',
+  ];
+};

@@ -20,9 +20,9 @@ const Index = () => {
                 <Waves className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-base sm:text-2xl font-bold leading-tight truncate">Jakarta Flood Alert</h1>
+                <h1 className="text-base sm:text-2xl font-bold leading-tight truncate">AquaWatch</h1>
                 <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-                  Real-time flood risk monitoring
+                  Global flood &amp; rainfall risk monitoring
                 </p>
               </div>
             </div>
@@ -57,7 +57,7 @@ const Index = () => {
           <div className="mb-3 sm:mb-4">
             <h2 className="text-lg sm:text-xl font-semibold">Interactive Risk Map</h2>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-              Tap a district marker to see detailed rainfall and water level data
+              Now tracking Jakarta, Indonesia — tap a district marker for detailed data. More cities coming soon.
             </p>
           </div>
           <JakartaMap />
@@ -91,7 +91,7 @@ const Index = () => {
         <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-center text-xs sm:text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <Waves className="w-3.5 h-3.5" />
-            Jakarta Flood Alert System
+            AquaWatch
           </span>
           <span className="hidden sm:inline">•</span>
           <span>Climate Action Initiative</span>

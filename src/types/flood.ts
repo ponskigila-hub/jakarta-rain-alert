@@ -8,6 +8,8 @@ export interface DistrictData {
   coordinates: [number, number];
   isFloodProne: boolean;
   waterLevel: number; // in cm
+  description: string;
+  population: string;
 }
 
 export interface RainfallHistory {

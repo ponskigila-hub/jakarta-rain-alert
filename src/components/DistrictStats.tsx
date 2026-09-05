@@ -1,7 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { jakartaDistricts } from '@/data/mockData';
 import { RiskBadge } from './RiskBadge';
-import { Droplets, Waves, AlertTriangle } from 'lucide-react';
+import { Droplets, Waves, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const riskBarColor: Record<string, string> = {
   safe: 'bg-risk-safe',
@@ -21,9 +22,10 @@ export const DistrictStats = () => {
       </CardHeader>
       <CardContent className="space-y-2.5">
         {sortedDistricts.map((district) => (
-          <div
+          <Link
             key={district.id}
-            className="p-3 rounded-lg border bg-card hover:bg-accent/5 hover:shadow-sm transition-all"
+            to={`/district/${district.id}`}
+            className="block p-3 rounded-lg border bg-card hover:bg-accent/5 hover:shadow-sm hover:border-primary/30 transition-all"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
@@ -53,7 +55,10 @@ export const DistrictStats = () => {
                   </div>
                 </div>
               </div>
-              <RiskBadge level={district.riskLevel} showIcon={false} />
+              <div className="flex items-center gap-1.5 shrink-0">
+                <RiskBadge level={district.riskLevel} showIcon={false} />
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              </div>
             </div>
             <div className="mt-2.5 h-1.5 rounded-full bg-muted overflow-hidden">
               <div
@@ -61,7 +66,7 @@ export const DistrictStats = () => {
                 style={{ width: `${Math.min(100, (district.rainfall / maxRainfall) * 100)}%` }}
               />
             </div>
-          </div>
+          </Link>
         ))}
       </CardContent>
     </Card>
