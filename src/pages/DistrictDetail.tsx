@@ -4,12 +4,14 @@ import {
   getDistrictRainfallHistory,
   getDistrictWaterLevelHistory,
   getSafetyTips,
+  metricSources,
 } from '@/data/mockData';
 import { RiskBadge } from '@/components/RiskBadge';
 import { TrendChart } from '@/components/TrendChart';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   ArrowLeft,
   Droplets,
@@ -19,13 +21,48 @@ import {
   AlertTriangle,
   ShieldCheck,
   Compass,
+  Info,
 } from 'lucide-react';
 
+// Stronger, higher-contrast risk tints for the hero banner and accents.
 const riskHero: Record<string, string> = {
-  high: 'from-risk-high/15 via-risk-high/5 to-transparent',
-  medium: 'from-risk-medium/15 via-risk-medium/5 to-transparent',
-  safe: 'from-risk-safe/15 via-risk-safe/5 to-transparent',
+  high: 'from-risk-high/25 via-risk-high/10 to-transparent border-risk-high/30',
+  medium: 'from-risk-medium/25 via-risk-medium/10 to-transparent border-risk-medium/30',
+  safe: 'from-risk-safe/25 via-risk-safe/10 to-transparent border-risk-safe/30',
 };
+
+interface MetricCardProps {
+  icon: React.ReactNode;
+  iconBg: string;
+  label: string;
+  value: React.ReactNode;
+  source: { source: string; detail: string };
+}
+
+const MetricCard = ({ icon, iconBg, label, value, source }: MetricCardProps) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Card className="border-2 hover:border-primary/40 transition-colors cursor-help">
+        <CardContent className="p-4 sm:p-5 flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
+            {icon}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-foreground/70 font-medium flex items-center gap-1">
+              {label}
+              <Info className="w-3 h-3 text-foreground/40" />
+            </p>
+            <p className="text-lg sm:text-xl font-bold text-foreground truncate">{value}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </TooltipTrigger>
+    <TooltipContent side="top" className="max-w-[260px] text-xs leading-relaxed">
+      <p className="font-semibold mb-1">{source.source}</p>
+      <p className="text-popover-foreground/80">{source.detail}</p>
+    </TooltipContent>
+  </Tooltip>
+);
 
 const DistrictDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,16 +107,16 @@ const DistrictDetail = () => {
       </header>
 
       {/* Hero */}
-      <div className={`bg-gradient-to-b ${riskHero[district.riskLevel]}`}>
+      <div className={`bg-gradient-to-b border-b-2 ${riskHero[district.riskLevel]}`}>
         <div className="container mx-auto px-4 pt-8 pb-6 sm:pt-12 sm:pb-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground mb-2">
+              <div className="flex items-center gap-2 text-xs sm:text-sm text-foreground/70 font-medium mb-2">
                 <MapPin className="w-3.5 h-3.5" />
                 Jakarta, Indonesia
               </div>
-              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight">{district.name}</h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl leading-relaxed">
+              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-foreground">{district.name}</h1>
+              <p className="text-sm sm:text-base text-foreground/80 mt-2 max-w-2xl leading-relaxed">
                 {district.description}
               </p>
             </div>
@@ -91,57 +128,41 @@ const DistrictDetail = () => {
       {/* Main content */}
       <main className="container mx-auto px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Key metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card>
-            <CardContent className="p-4 sm:p-5 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <Droplets className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Rainfall</p>
-                <p className="text-lg sm:text-xl font-bold">{district.rainfall}mm</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 sm:p-5 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
-                <Waves className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Water Level</p>
-                <p className="text-lg sm:text-xl font-bold">{district.waterLevel}cm</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 sm:p-5 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-secondary text-secondary-foreground flex items-center justify-center shrink-0">
-                <Users className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Population</p>
-                <p className="text-lg sm:text-xl font-bold truncate">{district.population}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 sm:p-5 flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  district.isFloodProne ? 'bg-risk-high/10 text-risk-high' : 'bg-risk-safe/10 text-risk-safe'
-                }`}
-              >
-                {district.isFloodProne ? <AlertTriangle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">Area Type</p>
-                <p className="text-sm sm:text-base font-bold leading-tight">
-                  {district.isFloodProne ? 'Flood-Prone' : 'Normal Area'}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+        <div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <MetricCard
+              icon={<Droplets className="w-5 h-5" />}
+              iconBg="bg-primary/15 text-primary"
+              label="Rainfall"
+              value={`${district.rainfall}mm`}
+              source={metricSources.rainfall}
+            />
+            <MetricCard
+              icon={<Waves className="w-5 h-5" />}
+              iconBg="bg-accent/15 text-accent"
+              label="Water Level"
+              value={`${district.waterLevel}cm`}
+              source={metricSources.waterLevel}
+            />
+            <MetricCard
+              icon={<Users className="w-5 h-5" />}
+              iconBg="bg-secondary text-secondary-foreground"
+              label="Population"
+              value={district.population}
+              source={metricSources.population}
+            />
+            <MetricCard
+              icon={district.isFloodProne ? <AlertTriangle className="w-5 h-5" /> : <ShieldCheck className="w-5 h-5" />}
+              iconBg={district.isFloodProne ? 'bg-risk-high/15 text-risk-high' : 'bg-risk-safe/15 text-risk-safe'}
+              label="Area Type"
+              value={district.isFloodProne ? 'Flood-Prone' : 'Normal Area'}
+              source={metricSources.areaType}
+            />
+          </div>
+          <p className="text-xs text-foreground/50 mt-2 flex items-center gap-1">
+            <Info className="w-3 h-3" />
+            Hover any metric to see where its data comes from
+          </p>
         </div>
 
         {/* Trend charts */}
@@ -172,15 +193,15 @@ const DistrictDetail = () => {
         </div>
 
         {/* Safety guidance */}
-        <Card>
+        <Card className="border-2">
           <CardContent className="p-5 sm:p-6">
             <div className="flex items-center gap-2 mb-3">
               <ShieldCheck className="w-5 h-5 text-primary" />
-              <h2 className="font-semibold text-base sm:text-lg">Safety Recommendations</h2>
+              <h2 className="font-semibold text-base sm:text-lg text-foreground">Safety Recommendations</h2>
             </div>
             <ul className="space-y-2">
               {safetyTips.map((tip, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">
+                <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/80">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
                   <span className="leading-relaxed">{tip}</span>
                 </li>
@@ -192,16 +213,16 @@ const DistrictDetail = () => {
         {/* Other districts */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Compass className="w-4 h-4 text-muted-foreground" />
-            <h2 className="font-semibold text-base sm:text-lg">Other Districts</h2>
+            <Compass className="w-4 h-4 text-foreground/60" />
+            <h2 className="font-semibold text-base sm:text-lg text-foreground">Other Nearby Districts</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {otherDistricts.map((d) => (
               <Link key={d.id} to={`/district/${d.id}`}>
-                <Card className="hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer h-full">
+                <Card className="border-2 hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40 transition-all cursor-pointer h-full">
                   <CardContent className="p-3.5 sm:p-4">
                     <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <h3 className="font-medium text-sm truncate">{d.name}</h3>
+                      <h3 className="font-medium text-sm truncate text-foreground">{d.name}</h3>
                     </div>
                     <RiskBadge level={d.riskLevel} showIcon={false} />
                   </CardContent>

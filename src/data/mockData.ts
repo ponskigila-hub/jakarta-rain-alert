@@ -215,3 +215,34 @@ export const getSafetyTips = (district: DistrictData): string[] => {
     'Continue to monitor forecasts during the rainy season (Oct–Mar).',
   ];
 };
+
+// Explains where each metric's numbers come from, shown in tooltips on the
+// district detail page. In this demo the underlying values are mocked, but
+// the sourcing described here reflects the kind of real feeds a production
+// system would wire up.
+export const metricSources = {
+  rainfall: {
+    label: 'Rainfall',
+    source: 'BMKG automatic rain gauges',
+    detail:
+      'Aggregated from BMKG (Indonesian Agency for Meteorology, Climatology and Geophysics) rain gauge stations within the district, measuring accumulated rainfall in mm over the last 24 hours.',
+  },
+  waterLevel: {
+    label: 'Water Level',
+    source: 'BPBD DKI Jakarta AWLR sensors',
+    detail:
+      "Reported by BPBD DKI Jakarta's Automatic Water Level Recorders (AWLR) installed at key rivers, canals and floodgates, measuring water height in cm above the normal baseline.",
+  },
+  population: {
+    label: 'Population',
+    source: 'BPS Statistics Indonesia',
+    detail:
+      'Estimated resident population from the most recent BPS (Badan Pusat Statistik) district-level census and annual population projections.',
+  },
+  areaType: {
+    label: 'Area Type',
+    source: 'Jakarta flood risk mapping',
+    detail:
+      "Classified using historical flood incident records, land elevation, and drainage capacity data from Jakarta's flood risk mapping, maintained jointly by BPBD and Jakarta Smart City.",
+  },
+} as const;

@@ -1,12 +1,23 @@
-import { JakartaMap } from '@/components/JakartaMap';
+import { lazy, Suspense } from 'react';
 import { RainfallChart } from '@/components/RainfallChart';
 import { WaterLevelChart } from '@/components/WaterLevelChart';
 import { AlertList } from '@/components/AlertList';
 import { DistrictStats } from '@/components/DistrictStats';
 import { StatsOverview } from '@/components/StatsOverview';
+import { InsightsPanel } from '@/components/InsightsPanel';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { recentAlerts } from '@/data/mockData';
-import { Waves } from 'lucide-react';
+import { Waves, Loader2 } from 'lucide-react';
+
+// The globe pulls in three.js, so it's lazy-loaded to keep the initial bundle light.
+const RiskGlobe = lazy(() => import('@/components/RiskGlobe').then((m) => ({ default: m.RiskGlobe })));
+
+const GlobeFallback = () => (
+  <div className="w-full h-[340px] sm:h-[420px] lg:h-[500px] rounded-lg border bg-[#0a1128] flex flex-col items-center justify-center gap-2 text-white/70">
+    <Loader2 className="w-6 h-6 animate-spin" />
+    <p className="text-xs">Loading globe…</p>
+  </div>
+);
 
 const Index = () => {
   return (
@@ -52,15 +63,20 @@ const Index = () => {
         {/* Stats Overview */}
         <StatsOverview />
 
-        {/* Map Section */}
+        {/* Insights */}
+        <InsightsPanel />
+
+        {/* Globe Section */}
         <section>
           <div className="mb-3 sm:mb-4">
-            <h2 className="text-lg sm:text-xl font-semibold">Interactive Risk Map</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">Interactive Risk Globe</h2>
             <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-              Now tracking Jakarta, Indonesia — tap a district marker for detailed data. More cities coming soon.
+              Now tracking Jakarta, Indonesia — spin the globe and click a point for detailed data. More cities coming soon.
             </p>
           </div>
-          <JakartaMap />
+          <Suspense fallback={<GlobeFallback />}>
+            <RiskGlobe />
+          </Suspense>
         </section>
 
         {/* Charts Grid */}
